@@ -1,4 +1,4 @@
-# MQTT TOOLs
+# MQTTZ
 
 ## 前置条件
 
@@ -14,7 +14,7 @@ docker run -d --name emqx -p 1883:1883 -p 8083:8083 -p 8084:8084 -p 8883:8883 -p
 go get github.com/eclipse/paho.mqtt.golang
 ```
 
-## 功能目标
+## 支持功能
 
 - 基础功能
     - 配置 MQTT 协议配置，并且提供默认值
