@@ -41,13 +41,13 @@ go get github.com/eclipse/paho.mqtt.golang
             "interval": "1s",
             "mqtt_data": [
                 {
-                    "topic": "veh/1",
+                    "topic": "1",
                     "data": {
                         "id": "1"
                     }
                 },
                 {
-                    "topic": "veh/1",
+                    "topic": "1",
                     "data": {
                         "id": "2"
                     }
@@ -59,23 +59,28 @@ go get github.com/eclipse/paho.mqtt.golang
             "interval": "3s",
             "mqtt_data": [
                 {
-                    "topic": "veh/2",
+                    "topic": "2",
                     "data": {
                         "id": "3"
                     }
                 },
                 {
-                    "topic": "veh/2",
+                    "topic": "2",
                     "data": {
                         "id": "4"
                     }
                 }
             ]
+        },
+        {
+            "is_for": false,
+            "interval": "5s",
+            "source": "out.json"
         }
     ],
     "output_config": {
         "sub_topics": [
-            "veh/#"
+            "#"
         ],
         "output_file_name": "out"
     }

@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"mqtt/utils"
 	"os"
 	"sync"
 	"time"
@@ -28,13 +29,14 @@ type MQTTConfig struct {
 
 type Config struct {
 	MQTTConfig
-	InputConfigs []InputConfig `json:"input_configs"`
-	OutPutConfig OutputConfig  `json:"output_config"`
+	InputConfigs []*InputConfig `json:"input_configs"`
+	OutPutConfig OutputConfig   `json:"output_config"`
 }
 
 type InputConfig struct {
 	IsFor    bool       `json:"is_for"`   // 是否循环
 	Interval string     `json:"interval"` // 每个 topic 数据发送的时间间隔
+	Source   string     `json:"source"`   // 数据源，没有使用自身数据，有则加载json
 	Data     []MQTTData `json:"mqtt_data"`
 }
 
@@ -49,13 +51,13 @@ type MQTTData struct {
 }
 
 func main() {
-	loadConfigFile()
+	loadConfig()
 	fmt.Printf("%+v\n", conf)
 	NewMqttClient()
 	subData()
 	for _, config := range conf.InputConfigs {
 		waitGroup.Add(1)
-		go pubData(config)
+		go pubData(*config)
 	}
 	waitGroup.Wait()
 	_, err := outputFile.WriteString("]")
@@ -84,15 +86,14 @@ func NewMqttClient() {
 	}
 }
 
-// loadConfigFile 使用 config.json
-func loadConfigFile() {
-	file, err := os.ReadFile(configFile)
-	if err != nil {
-		panic(err)
-	}
-	err = json.Unmarshal(file, &conf)
-	if err != nil {
-		panic(err)
+// loadConfig 使用 config.json
+func loadConfig() {
+	utils.LoadJSONFile(configFile, &conf)
+
+	for _, config := range conf.InputConfigs {
+		if config.Source != "" {
+			utils.LoadJSONFile(config.Source, &config.Data)
+		}
 	}
 }
 
@@ -122,7 +123,7 @@ func subData() {
 		fmt.Printf("sub topic:%s data:%v\n", msg.Topic(), string(msg.Payload()))
 
 		var d any
-		_ = json.Unmarshal([]byte(msg.Payload()), &d)
+		_ = json.Unmarshal(msg.Payload(), &d)
 		data := MQTTData{
 			Topic: msg.Topic(),
 			Data:  d,
