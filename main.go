@@ -5,11 +5,26 @@ import (
 	"fmt"
 	"mqtt/utils"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
+
+var (
+	// makefile build auto generate
+	AUTHOR  string
+	VERSION string
+)
+
+var LOGO = strings.Join([]string{
+	"  __  __  \033[1;38;2;98;191;140m___\033[0m\033[1;38;2;160;195;250m _____ _____\033[0m\033[1;38;2;255;0;0m _____\033[0m",
+	" |  \\/  |\033[1;38;2;98;191;140m/ _ \\\033[0m\033[1;38;2;160;195;250m_   _|_   _|\033[0m\033[1;38;2;255;0;0m__  /\033[0m",
+	" | |\\/| |\033[1;38;2;98;191;140m | | |\033[0m\033[1;38;2;160;195;250m| |   | |\033[0m\033[1;38;2;255;0;0m   / /\033[0m",
+	" | |  | | \033[1;38;2;98;191;140m|_| |\033[0m\033[1;38;2;160;195;250m| |   | |\033[0m\033[1;38;2;255;0;0m  / /_\033[0m",
+	" |_|  |_|\033[1;38;2;98;191;140m\\__\\_\\\033[0m\033[1;38;2;160;195;250m|_|   |_|\033[0m\033[1;38;2;255;0;0m /____|\033[0m",
+}, "\n") + "\n"
 
 var (
 	configFile = "config.json"
@@ -51,6 +66,9 @@ type MQTTData struct {
 }
 
 func main() {
+	fmt.Println(LOGO)
+	fmt.Printf("Author: %s\n", AUTHOR)
+	fmt.Printf("Version: %s\n", VERSION)
 	loadConfig()
 	fmt.Printf("%+v\n", conf)
 	NewMqttClient()
@@ -120,7 +138,11 @@ func subData() {
 	isSubFrist := true
 
 	mqttClient.SubscribeMultiple(filters, func(_ mqtt.Client, msg mqtt.Message) {
-		fmt.Printf("sub topic:%s data:%v\n", msg.Topic(), string(msg.Payload()))
+		fmt.Printf("%s %s topic:%s data:%v\n",
+			time.Now().Format(time.RFC3339),
+			utils.UseColor("sub", 255, 255, 0),
+			msg.Topic(),
+			string(msg.Payload()))
 
 		var d any
 		_ = json.Unmarshal(msg.Payload(), &d)
@@ -146,10 +168,14 @@ func subData() {
 
 func pubData(conf InputConfig) {
 	isFrist := true
-	for ; isFrist || conf.IsFor; {
+	for isFrist || conf.IsFor {
 		isFrist = false
 		for _, data := range conf.Data {
-			fmt.Printf("pub topic:%s data:%v\n", data.Topic, data.Data)
+			fmt.Printf("%s %s topic:%s data:%v\n",
+				time.Now().Format(time.RFC3339),
+				utils.UseColor("pub", 0, 0, 255),
+				data.Topic,
+				data.Data)
 
 			duration, err := time.ParseDuration(conf.Interval)
 			if err != nil {
