@@ -1,6 +1,15 @@
+# 禁止 IDE 配置
+.fleet
+.idea
+.vscode
+
 # 禁止提交二进制文件
 bin
 *.exe
 
-# 禁止提交JSON文件
+# 禁止提交配置和数据文件
 *.json
+*.yaml
+
+# 排除 template
+!template/

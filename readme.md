@@ -1,5 +1,16 @@
 # MQTTZ
 
+## 功能目标
+
+- 提供对多 MQTT 服务处理的能力
+    - 添加多个服务的连接配置
+    - 提供数据转发能力
+    - 提供多种数据源的处理（json、yaml、MQTTClient）
+
+```mermaid
+input 处理器（过滤、序列化...）-> dataCh -> output 处理器（反序列化、过滤...）
+```
+
 ## 前置条件
 
 使用 [EMQX](https://github.com/emqx/emqx) 的 docker 镜像本地部署服务
@@ -26,63 +37,22 @@ go get github.com/eclipse/paho.mqtt.golang
 
 ## 使用参数
 
-读取当前路径下的 `config.json` 文件
+默认读取 `./conf/config.yaml` 文件
 
-```json
-{
-    "broker": "127.0.0.1",
-    "port": 1883,
-    "client_id": "mqtt_client",
-    "username": "",
-    "password": "",
-    "input_configs": [
-        {
-            "is_for": false,
-            "interval": "1s",
-            "mqtt_data": [
-                {
-                    "topic": "1",
-                    "data": {
-                        "id": "1"
-                    }
-                },
-                {
-                    "topic": "1",
-                    "data": {
-                        "id": "2"
-                    }
-                }
-            ]
-        },
-        {
-            "is_for": false,
-            "interval": "3s",
-            "mqtt_data": [
-                {
-                    "topic": "2",
-                    "data": {
-                        "id": "3"
-                    }
-                },
-                {
-                    "topic": "2",
-                    "data": {
-                        "id": "4"
-                    }
-                }
-            ]
-        },
-        {
-            "is_for": false,
-            "interval": "5s",
-            "source": "out.json"
-        }
-    ],
-    "output_config": {
-        "sub_topics": [
-            "#"
-        ],
-        "output_file_name": "out"
-    }
-}
+```yaml
+mqtt_configs:
+    - broker: 127.0.0.1
+      port: 1883
+      client_id: mqtt_client_1
+      username: ""
+      password: ""
+      nickname: "abc" # 别名用作查找的 Key，如果不存在则是用 {client_id}@{broker} 作为 Key
+    - broker: 127.0.0.1
+      port: 1883
+      client_id: mqtt_client_2
+      username: ""
+      password: ""
+      nickname: "" # 别名用作查找的 Key，如果不存在则是用 {client_id}@{broker} 作为 Key
+
+input_configs:
 ```
