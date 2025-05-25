@@ -7,10 +7,6 @@
     - 提供数据转发能力
     - 提供多种数据源的处理（json、yaml、MQTTClient）
 
-```mermaid
-input 处理器（过滤、序列化...）-> dataCh -> output 处理器（反序列化、过滤...）
-```
-
 ## 前置条件
 
 使用 [EMQX](https://github.com/emqx/emqx) 的 docker 镜像本地部署服务
@@ -47,6 +43,25 @@ mqtt_configs:
       username: ""
       password: ""
       nickname: "abc" # 别名用作查找的 Key，如果不存在则是用 {client_id}@{broker} 作为 Key
+      pub_configs:
+          - enable_for: true
+            interval: 1s
+            source_type: conf
+            source_data:
+                - topic: 1
+                  payload: { "test": 1 }
+                - topic: 2
+                  payload: { "test": 2 }
+          - enable_for: true
+            interval: 1s
+            source_type: json
+            source_path: ./bin/conf/data.json
+      sub_configs:
+          - topic: json/1
+            qos: 0
+          - topics:
+                - "2"
+                - "1"
     - broker: 127.0.0.1
       port: 1883
       client_id: mqtt_client_2
@@ -54,5 +69,4 @@ mqtt_configs:
       password: ""
       nickname: "" # 别名用作查找的 Key，如果不存在则是用 {client_id}@{broker} 作为 Key
 
-input_configs:
 ```
