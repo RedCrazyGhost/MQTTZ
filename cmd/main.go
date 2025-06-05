@@ -40,6 +40,16 @@ func main() {
 	}
 	mqttz.clientManager.Start()
 
+	go func() {
+		targetClient := mqttz.clientManager.GetMQTTClient("MQTTZ_2")
+		for protocol := range mqttz.clientManager.GetMQTTClient("MQTTZ_1").Sub() {
+			targetClient.Pub(model.MQTTData{
+				Topic:   "remove/" + protocol.GetTopic(),
+				Payload: protocol.GetPayload(),
+			})
+		}
+	}()
+
 	select {}
 }
 
