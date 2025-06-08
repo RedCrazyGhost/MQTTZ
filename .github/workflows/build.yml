@@ -3,8 +3,8 @@ name: Build
 on:
   push:
     branches: [ main ]
-    tags: [ '*.*.*' ]
-
+  tags:
+    - '*.*.*'  # 只匹配类似 v1.0.0 这样的标签
 
 jobs:
   lint:
@@ -23,6 +23,7 @@ jobs:
         uses: golangci/golangci-lint-action@v8
         with:
           version: v2.1
+
   build:
     name: Build
     needs: lint
@@ -59,10 +60,12 @@ jobs:
         with:
           name: ${{ matrix.artifact_name }}
           path: ./bin/${{ matrix.artifact_name }}
+
   release:
     name: Release
     runs-on: ubuntu-latest
     needs: build
+    if: startsWith(github.ref, 'refs/tags/')
     steps:
       - uses: actions/checkout@v4
 
