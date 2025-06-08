@@ -70,6 +70,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: ./artifacts
+          merge-multiple: true
+
+      - name: List artifacts
+        run: ls -la artifacts/
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
@@ -78,5 +82,6 @@ jobs:
             ./artifacts/MQTTZ-linux-amd64
             ./artifacts/MQTTZ-windows-amd64.exe
             ./artifacts/MQTTZ-darwin-amd64
+        generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
