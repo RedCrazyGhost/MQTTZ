@@ -22,9 +22,6 @@ func InitializeMQTTZ() (*MQTTZ, error) {
 	if err != nil {
 		return nil, err
 	}
-	mqttz, err := NewMQTTZ(config, clientManager)
-	if err != nil {
-		return nil, err
-	}
+	mqttz := NewMQTTZ(config, clientManager)
 	return mqttz, nil
 }

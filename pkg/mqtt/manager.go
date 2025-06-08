@@ -2,18 +2,19 @@ package mqtt
 
 import (
 	"errors"
-	"fmt"
 	"sync"
 
 	"MQTTZ/model"
+	"MQTTZ/pkg/logger"
 
 	"github.com/google/wire"
+	"go.uber.org/zap"
 )
 
 var ProviderSet = wire.NewSet(NewMQTTClientManager)
 
 type ClientManager struct {
-	clientMaps sync.Map // map[string]*MQTTClient
+	clientMaps sync.Map // map[string]*Client
 
 	forwardRulesMap map[string]map[string][]model.ForwardRule // clientID -> topic -> forwardRules
 }
@@ -57,25 +58,34 @@ func NewMQTTClientManager(conf *model.Config) (*ClientManager, error) {
 		manager.clientMaps.Store(client.id, client)
 	}
 
-	fmt.Println(manager.forwardRulesMap)
+	logger.Info("forward rules map", zap.Any("forward_rules_map", manager.forwardRulesMap))
 	return manager, nil
 }
 
 func (m *ClientManager) Start() {
 	m.clientMaps.Range(func(_, value any) bool {
-		go value.(*MQTTClient).Run()
-		go m.MQTTClientForwardData(value.(*MQTTClient).id)
+		client := value.(*Client)
+		go client.Run()
+		go func() {
+			if err := m.MQTTClientForwardData(client.id); err != nil {
+				logger.Error("forward data failed",
+					zap.String("client_id", client.id),
+					zap.Error(err),
+				)
+			}
+		}()
+		logger.Info("start mqtt client", zap.String("client_id", client.id))
 		return true
 	})
 
 }
 
-func (m *ClientManager) GetMQTTClient(key string) *MQTTClient {
+func (m *ClientManager) GetMQTTClient(key string) *Client {
 	client, ok := m.clientMaps.Load(key)
 	if !ok {
 		return nil
 	}
-	return client.(*MQTTClient)
+	return client.(*Client)
 }
 
 func (m *ClientManager) GetMQTTClientInputDataChan(key string) chan<- model.MQTTDataProtocol {
@@ -83,7 +93,7 @@ func (m *ClientManager) GetMQTTClientInputDataChan(key string) chan<- model.MQTT
 	if !ok {
 		return nil
 	}
-	return client.(*MQTTClient).pubDataCh
+	return client.(*Client).pubDataCh
 }
 
 func (m *ClientManager) GetMQTTClientOutputDataChan(key string) <-chan model.MQTTDataProtocol {
@@ -91,7 +101,7 @@ func (m *ClientManager) GetMQTTClientOutputDataChan(key string) <-chan model.MQT
 	if !ok {
 		return nil
 	}
-	return client.(*MQTTClient).subDataCh
+	return client.(*Client).subDataCh
 }
 
 func (m *ClientManager) MQTTClientPub(key string, data any) error {

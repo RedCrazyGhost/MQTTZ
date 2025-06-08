@@ -7,12 +7,14 @@ import (
 	"time"
 
 	"MQTTZ/model"
-	"MQTTZ/utils"
+	"MQTTZ/pkg/logger"
+	"MQTTZ/utils/color"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"go.uber.org/zap"
 )
 
-type MQTTClient struct {
+type Client struct {
 	id string
 	c  mqtt.Client
 	sync.WaitGroup
@@ -24,8 +26,8 @@ type MQTTClient struct {
 	subDataCh chan model.MQTTDataProtocol
 }
 
-func NewMQTTClient(conf model.MQTTConfig) (*MQTTClient, error) {
-	client := &MQTTClient{
+func NewMQTTClient(conf model.MQTTConfig) (*Client, error) {
+	client := &Client{
 		id: cmp.Or(conf.Nickname, fmt.Sprintf("%s@%s", conf.ClientID, conf.Broker)),
 
 		pubConf:   conf.PubConfigs,
@@ -39,11 +41,16 @@ func NewMQTTClient(conf model.MQTTConfig) (*MQTTClient, error) {
 	opts.SetClientID(conf.ClientID)
 	opts.SetUsername(conf.Username)
 	opts.SetPassword(conf.Password)
-	opts.SetOnConnectHandler(func(client mqtt.Client) {
-		fmt.Printf("Connect Client Name: %s\n", conf.ClientID)
+	opts.SetOnConnectHandler(func(_ mqtt.Client) {
+		logger.Info("MQTT client connected",
+			zap.String("client_id", client.id),
+		)
 	})
-	opts.SetConnectionLostHandler(func(client mqtt.Client, err error) {
-		fmt.Printf("Connect Lost Client Name: %s\n", conf.ClientID)
+	opts.SetConnectionLostHandler(func(_ mqtt.Client, err error) {
+		logger.Error("MQTT client connection lost",
+			zap.String("client_id", client.id),
+			zap.Error(err),
+		)
 	})
 
 	client.c = mqtt.NewClient(opts)
@@ -51,7 +58,7 @@ func NewMQTTClient(conf model.MQTTConfig) (*MQTTClient, error) {
 	return client, nil
 }
 
-func (m *MQTTClient) Run() {
+func (m *Client) Run() {
 	if token := m.c.Connect(); token.Wait() && token.Error() != nil {
 		panic(token.Error())
 	}
@@ -82,7 +89,7 @@ func (m *MQTTClient) Run() {
 	m.Wait()
 }
 
-func (m *MQTTClient) sub() {
+func (m *Client) sub() {
 	subMap := make(map[string]byte)
 	for _, conf := range m.subConf {
 		if conf.Topic != "" {
@@ -92,12 +99,13 @@ func (m *MQTTClient) sub() {
 			subMap[topic] = conf.Qos
 		}
 	}
-	m.c.SubscribeMultiple(subMap, func(client mqtt.Client, message mqtt.Message) {
-		fmt.Printf("%s %s topic:%s data:%v\n",
-			time.Now().Format(time.RFC3339),
-			utils.UseColor("sub", 255, 255, 0),
-			message.Topic(),
-			string(message.Payload()))
+	m.c.SubscribeMultiple(subMap, func(_ mqtt.Client, message mqtt.Message) {
+		logger.Info(
+			color.Theme.Sub.Text("sub"),
+			zap.String("client_id", m.id),
+			zap.String("topic", message.Topic()),
+			zap.ByteString("payload", message.Payload()),
+		)
 		m.subDataCh <- model.MQTTData{
 			Topic:   message.Topic(),
 			QoS:     message.Qos(),
@@ -107,26 +115,27 @@ func (m *MQTTClient) sub() {
 	})
 }
 
-func (m *MQTTClient) pub() {
+func (m *Client) pub() {
 	defer m.Done()
 	for data := range m.pubDataCh {
 		_ = m.c.Publish(data.GetTopic(), data.GetQoS(), data.GetRetain(), data.GetPayload())
 	}
 }
 
-func (m *MQTTClient) Pub(data any) {
+func (m *Client) Pub(data any) {
 	mqttData, ok := data.(model.MQTTDataProtocol)
 	if !ok {
 		return
 	}
-	fmt.Printf("%s %s topic:%s data:%v\n",
-		time.Now().Format(time.RFC3339),
-		utils.UseColor("pub", 0, 0, 255),
-		mqttData.GetTopic(),
-		string(mqttData.GetPayload()))
+	logger.Info(
+		color.Theme.Pub.Text("pub"),
+		zap.String("client_id", m.id),
+		zap.String("topic", mqttData.GetTopic()),
+		zap.ByteString("payload", mqttData.GetPayload()),
+	)
 	m.pubDataCh <- mqttData
 }
 
-func (m *MQTTClient) Sub() <-chan model.MQTTDataProtocol {
+func (m *Client) Sub() <-chan model.MQTTDataProtocol {
 	return m.subDataCh
 }

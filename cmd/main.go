@@ -5,14 +5,17 @@ import (
 	"strings"
 
 	"MQTTZ/model"
+	"MQTTZ/pkg/logger"
 	"MQTTZ/pkg/mqtt"
+
+	"go.uber.org/zap"
 )
 
 // makefile build auto generate
 var (
-	AUTHOR   string
-	VERSION  string
-	REPO_URL string
+	Author  string
+	Version string
+	RepoURL string
 )
 
 var LOGO = strings.Join([]string{
@@ -21,9 +24,9 @@ var LOGO = strings.Join([]string{
 	" | |\\/| |\033[1;38;2;98;191;140m | | |\033[0m\033[1;38;2;160;195;250m| |   | |\033[0m\033[1;38;2;255;0;0m   / /\033[0m",
 	" | |  | | \033[1;38;2;98;191;140m|_| |\033[0m\033[1;38;2;160;195;250m| |   | |\033[0m\033[1;38;2;255;0;0m  / /_\033[0m",
 	" |_|  |_|\033[1;38;2;98;191;140m\\__\\_\\\033[0m\033[1;38;2;160;195;250m|_|   |_|\033[0m\033[1;38;2;255;0;0m /____|\033[0m",
-	"Author: " + AUTHOR,
-	"Version: " + VERSION,
-	"Repo Url: " + REPO_URL,
+	" Author: " + Author,
+	" Version: " + Version,
+	" Repo Url: " + RepoURL,
 }, "\n") + "\n"
 
 type MQTTZ struct {
@@ -36,26 +39,17 @@ func main() {
 
 	mqttz, err := InitializeMQTTZ()
 	if err != nil {
+		logger.Error("initialize mqttz error", zap.Error(err))
 		panic(err)
 	}
+	logger.Info("initialize mqttz success")
 	mqttz.clientManager.Start()
-
-	go func() {
-		targetClient := mqttz.clientManager.GetMQTTClient("MQTTZ_2")
-		for protocol := range mqttz.clientManager.GetMQTTClient("MQTTZ_1").Sub() {
-			targetClient.Pub(model.MQTTData{
-				Topic:   "remove/" + protocol.GetTopic(),
-				Payload: protocol.GetPayload(),
-			})
-		}
-	}()
-
 	select {}
 }
 
-func NewMQTTZ(config *model.Config, manager *mqtt.ClientManager) (*MQTTZ, error) {
+func NewMQTTZ(config *model.Config, manager *mqtt.ClientManager) *MQTTZ {
 	return &MQTTZ{
 		config:        config,
 		clientManager: manager,
-	}, nil
+	}
 }

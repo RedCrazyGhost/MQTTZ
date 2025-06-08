@@ -1,20 +1,18 @@
 package model
 
-import (
-	"encoding/json"
-	"errors"
-	"fmt"
-
-	"MQTTZ/utils"
-)
-
 type ServerConfig struct {
 	Port int `yaml:"port"`
 }
 
 type LogConfig struct {
 	EnableDebug bool   `yaml:"enable_debug"`
-	OutputLevel string `yaml:"level"`
+	Level       string `yaml:"level"`
+	EnableColor bool   `yaml:"enable_color"`
+	OutputFile  string `yaml:"output_file"`
+	MaxSize     int    `yaml:"max_size"`    // 单个文件最大尺寸，单位：MB
+	MaxBackups  int    `yaml:"max_backups"` // 最大保留文件数
+	MaxAge      int    `yaml:"max_age"`     // 最大保留天数
+	Compress    bool   `yaml:"compress"`    // 是否压缩
 }
 
 type MQTTConfig struct {
@@ -52,60 +50,6 @@ const (
 	SourceTypeJSON SourceType = "json"
 	SourceTypeYAML SourceType = "yaml"
 )
-
-func (c *PubConfig) ParseData() error {
-	switch c.SourceType {
-	case SourceTypeConf:
-		if len(c.SourceData) == 0 {
-			return errors.New("请输入发送数据！发送数据不能为空")
-		}
-		return nil
-	case SourceTypeJSON:
-		err := utils.LoadJSONFile(c.SourcePath, &c.SourceData)
-		if err != nil {
-			return err
-		}
-	case SourceTypeYAML:
-		err := utils.LoadYAMLFile(c.SourcePath, &c.SourceData)
-		if err != nil {
-			return err
-		}
-	default:
-		return errors.New("未知数据类型，请检查类型")
-	}
-
-	var err error
-	for i := 0; i < len(c.SourceData); i++ {
-		switch d := c.SourceData[i].(type) {
-		case map[string]any:
-			var data any
-			dataJSON, _ := json.Marshal(d)
-
-			data = new(MockMQTTData)
-			err = json.Unmarshal(dataJSON, &data)
-			if err != nil {
-				fmt.Println(err)
-			} else {
-				c.SourceData[i] = data
-				break
-			}
-
-			data = new(MQTTData)
-			err = json.Unmarshal(dataJSON, &data)
-			if err != nil {
-				return err
-			}
-
-			c.SourceData[i] = data
-		default:
-			return errors.New("数据格式不合规")
-		}
-
-		fmt.Printf("%#v\n", c.SourceData[i])
-	}
-
-	return nil
-}
 
 type SubConfig struct {
 	Topic  string   `yaml:"topic,omitempty"`
