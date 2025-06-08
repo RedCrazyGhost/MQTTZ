@@ -1,17 +1,32 @@
 package utils
 
 import (
-	"encoding/json"
 	"os"
+
+	json "github.com/bytedance/sonic"
+	"gopkg.in/yaml.v3"
 )
 
-func LoadJSONFile(fileName string, value any) {
+func LoadJSONFile(fileName string, value any) error {
 	fileBytes, err := os.ReadFile(fileName)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	err = json.Unmarshal(fileBytes, value)
 	if err != nil {
-		panic(err)
+		return err
 	}
+	return nil
+}
+
+func LoadYAMLFile(fileName string, value any) error {
+	fileBytes, err := os.ReadFile(fileName)
+	if err != nil {
+		return err
+	}
+	err = yaml.Unmarshal(fileBytes, value)
+	if err != nil {
+		return err
+	}
+	return nil
 }

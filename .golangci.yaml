@@ -1,0 +1,27 @@
+run:
+  timeout: 5m
+  tests: true
+
+linters:
+  enable:
+    - govet          # 检查代码中的常见错误，如格式错误、未使用的变量等
+    - errcheck       # 检查错误是否被正确处理
+    - staticcheck    # 高级代码分析，发现潜在问题
+    - gosimple       # 检查可以简化的代码
+    - unused         # 检查未使用的代码
+    - ineffassign    # 检查无效的赋值
+    - typecheck      # 检查类型错误
+    - gocritic       # 代码风格检查
+    - gofmt          # 代码格式化检查
+    - goimports      # import 语句格式化
+    - revive         # 替代 golint，更现代的代码风格检查
+    - misspell       # 检查英文单词拼写错误
+    - gocyclo        # 检查代码复杂度
+    - dupl           # 检查重复代码
+    - nakedret       # 检查裸返回语句
+    - unparam        # 检查未使用的参数
+
+linters-settings:
+  # gofmt 配置
+  gofmt:
+    simplify: true   # 启用代码简化

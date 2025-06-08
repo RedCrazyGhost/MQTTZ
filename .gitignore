@@ -1,6 +1,63 @@
-# 禁止提交二进制文件
-bin
+# Go 语言相关
 *.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
 
-# 禁止提交JSON文件
-*.json
+# 构建输出目录
+/bin/
+/dist/
+
+# IDE 和编辑器
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.fleet/
+.DS_Store
+
+# 依赖目录
+/vendor/
+
+# 日志文件
+*.log
+/logs/
+
+# 本地配置文件
+config.json
+config.yaml
+config.yml
+*.local.yaml
+*.local.yml
+*.local.json
+
+# 测试覆盖率文件
+coverage.txt
+coverage.html
+*.cover
+
+# 临时文件
+tmp/
+temp/
+.tmp/
+.temp/
+
+# 环境文件
+.env
+.env.local
+.env.*.local
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 允许提交的配置文件
+!template/
+!config.example.json
+!config.example.yaml
+!config.example.yml
