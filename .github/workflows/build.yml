@@ -3,8 +3,7 @@ name: Build
 on:
   push:
     branches: [ main ]
-  tags:
-    - '*.*.*'  # 只匹配类似 v1.0.0 这样的标签
+    tags: [ '*.*.*' ]
 
 jobs:
   lint:
