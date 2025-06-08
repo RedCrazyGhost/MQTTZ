@@ -20,8 +20,6 @@ jobs:
           cache: true
 
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v4
+        uses: golangci/golangci-lint-action@v8
         with:
-          version: v2
-          args: --timeout=5m
-          cache: true
+          version: v2.1
