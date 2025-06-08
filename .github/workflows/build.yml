@@ -82,6 +82,5 @@ jobs:
             ./artifacts/MQTTZ-linux-amd64
             ./artifacts/MQTTZ-windows-amd64.exe
             ./artifacts/MQTTZ-darwin-amd64
-        generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
