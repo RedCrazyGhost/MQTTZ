@@ -26,7 +26,7 @@ type Client struct {
 	subDataCh chan model.MQTTDataProtocol
 }
 
-func NewMQTTClient(conf model.MQTTConfig) (*Client, error) {
+func NewMQTTClient(conf *model.MQTTConfig) (*Client, error) {
 	client := &Client{
 		id: cmp.Or(conf.Nickname, fmt.Sprintf("%s@%s", conf.ClientID, conf.Broker)),
 

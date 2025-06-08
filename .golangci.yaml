@@ -1,4 +1,4 @@
-version: 2
+version: "2"
 
 run:
   timeout: 5m
@@ -16,7 +16,7 @@ linters:
 
     # 代码风格检查
     - gocritic       # 代码风格检查
-    # - revive         # 替代 golint，更现代的代码风格检查 todo 后续处理
+    - revive         # 替代 golint，更现代的代码风格检查
     - misspell       # 检查英文单词拼写错误
 
     # 代码质量检查
@@ -24,6 +24,28 @@ linters:
     - dupl           # 检查重复代码
     - nakedret       # 检查裸返回语句
     - unparam        # 检查未使用的参数
+
+  settings:
+    gocritic:
+      enabled-tags:
+        - diagnostic
+        - performance
+        - style
+
+    revive:
+      rules:
+        - name: package-comments
+          disabled: true
+        - name: exported
+          disabled: true
+          arguments:
+            - disableStutteringCheck
+            - disableExportedCommentCheck
+    gocyclo:
+      min-complexity: 15
+
+    dupl:
+      threshold: 100
 
 formatters:
   # 启用特定的格式化工具
@@ -49,42 +71,6 @@ formatters:
       local-prefixes:
         - MQTTZ  # 本地项目前缀
 
-linters-settings:
-  gocritic:
-    enabled-tags:
-      - diagnostic
-      - performance
-      - style
-
-  revive:
-    rules:
-      - name: package-comments
-        disabled: true
-      - name: exported
-        disabled: true
-        arguments:
-          - disableStutteringCheck
-          - disableExportedCommentCheck
-
-
-  gocyclo:
-    min-complexity: 15
-
-  dupl:
-    threshold: 100
-
 issues:
-  exclude-rules:
-    - path: _test\.go
-      linters:
-        - dupl
-        - gocyclo
-    - path: pkg/logger/logger\.go
-      linters:
-        - revive
-    - path: utils/color/.*
-      linters:
-        - revive
-
   max-issues-per-linter: 0
   max-same-issues: 0
