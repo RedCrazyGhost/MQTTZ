@@ -24,7 +24,7 @@ const (
 	defaultCompress   = true
 )
 
-func Init(conf model.LogConfig) error {
+func Init(conf *model.LogConfig) error {
 	var level zapcore.Level
 
 	err := level.UnmarshalText([]byte(conf.Level))
@@ -61,7 +61,7 @@ func Init(conf model.LogConfig) error {
 			return err
 		}
 		if os.IsNotExist(err) {
-			if err := os.MkdirAll(conf.OutputFile, 0755); err != nil {
+			if err := os.MkdirAll(conf.OutputFile, 0o755); err != nil {
 				return err
 			}
 		}

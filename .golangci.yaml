@@ -1,27 +1,76 @@
+version: "2"
+
 run:
   timeout: 5m
   tests: true
+  allow-parallel-runners: true
 
 linters:
   enable:
+    # 核心检查
     - govet          # 检查代码中的常见错误，如格式错误、未使用的变量等
     - errcheck       # 检查错误是否被正确处理
     - staticcheck    # 高级代码分析，发现潜在问题
-    - gosimple       # 检查可以简化的代码
     - unused         # 检查未使用的代码
     - ineffassign    # 检查无效的赋值
-    - typecheck      # 检查类型错误
+
+    # 代码风格检查
     - gocritic       # 代码风格检查
-    - gofmt          # 代码格式化检查
-    - goimports      # import 语句格式化
     - revive         # 替代 golint，更现代的代码风格检查
     - misspell       # 检查英文单词拼写错误
+
+    # 代码质量检查
     - gocyclo        # 检查代码复杂度
     - dupl           # 检查重复代码
     - nakedret       # 检查裸返回语句
     - unparam        # 检查未使用的参数
 
-linters-settings:
-  # gofmt 配置
-  gofmt:
-    simplify: true   # 启用代码简化
+  settings:
+    gocritic:
+      enabled-tags:
+        - diagnostic
+        - performance
+        - style
+
+    revive:
+      rules:
+        - name: package-comments
+          disabled: true
+        - name: exported
+          disabled: true
+          arguments:
+            - disableStutteringCheck
+            - disableExportedCommentCheck
+    gocyclo:
+      min-complexity: 15
+
+    dupl:
+      threshold: 100
+
+formatters:
+  # 启用特定的格式化工具
+  # 默认值: [] (使用标准 Go 格式化)
+  enable:
+    - gci        # 导入语句分组和排序
+    - gofmt      # 标准 Go 代码格式化
+    - goimports  # 自动添加/删除导入语句
+  settings:
+    gci:
+      custom-order: true
+      # 导入语句分组
+      sections:
+        - Standard # 标准库
+        - Prefix(MQTTZ) # 项目本地包
+        - Default  # 第三方库
+    gofmt:
+      simplify: true
+      rewrite-rules:
+        - pattern: 'interface{}'
+          replacement: 'any'
+    goimports:
+      local-prefixes:
+        - MQTTZ  # 本地项目前缀
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0

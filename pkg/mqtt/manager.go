@@ -25,8 +25,9 @@ func NewMQTTClientManager(conf *model.Config) (*ClientManager, error) {
 		forwardRulesMap: make(map[string]map[string][]model.ForwardRule),
 	}
 
-	for _, config := range conf.MQTTConfigs {
-		client, err := NewMQTTClient(config)
+	for i := 0; i < len(conf.MQTTConfigs); i++ {
+		config := conf.MQTTConfigs[i]
+		client, err := NewMQTTClient(&config)
 		if err != nil {
 			return nil, err
 		}

@@ -44,11 +44,13 @@ clean:
 lint:
 ifndef GOLANGCI_LINT
 	@echo "🚀 golangci-lint 未安装"
-	@echo "📦 正在安装 golangci-lint..."
-	@go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-	@echo "✅ golangci-lint 安装完成"
+	@echo "📦 正在安装 golangci-lint v2..."
+	@go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.1.6
+	@echo "✅ golangci-lint v2 安装完成"
 else
 	@echo "✅ golangci-lint 已安装"
+	@echo "🔄 检查 golangci-lint 版本..."
+	@golangci-lint --version | grep -q "v2" || (echo "⚠️ 当前版本不是 v2，正在更新..." && go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.1.6)
 endif
 	@echo "🔍 开始代码检查..."
 	@golangci-lint run

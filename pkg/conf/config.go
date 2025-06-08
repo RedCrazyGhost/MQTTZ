@@ -39,7 +39,7 @@ func NewConfig() (*model.Config, error) {
 		return nil, err
 	}
 
-	if err := logger.Init(config.Log); err != nil {
+	if err := logger.Init(&config.Log); err != nil {
 		return nil, err
 	}
 
