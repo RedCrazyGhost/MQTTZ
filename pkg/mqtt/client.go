@@ -1,6 +1,7 @@
 package mqtt
 
 import (
+	"MQTTZ/pkg/processor"
 	"cmp"
 	"fmt"
 	"sync"
@@ -90,29 +91,42 @@ func (m *Client) Run() {
 }
 
 func (m *Client) sub() {
-	subMap := make(map[string]byte)
 	for _, conf := range m.subConf {
+		subMap := make(map[string]byte)
 		if conf.Topic != "" {
 			subMap[conf.Topic] = conf.Qos
 		}
 		for _, topic := range conf.Topics {
 			subMap[topic] = conf.Qos
 		}
+		m.c.SubscribeMultiple(subMap, func(_ mqtt.Client, message mqtt.Message) {
+			logger.Info(
+				color.Theme.Sub.Text("sub"),
+				zap.String("client_id", m.id),
+				zap.String("topic", message.Topic()),
+				zap.ByteString("payload", message.Payload()),
+			)
+
+			data := model.MQTTData{
+				Topic:   message.Topic(),
+				QoS:     message.Qos(),
+				Retain:  message.Retained(),
+				Payload: message.Payload(),
+			}
+
+			for _, p := range conf.Processors {
+				if !processor.Do(p, data) {
+					logger.Warn("run processor function",
+						zap.Any("type", p.GetProcessorType()),
+						zap.Any("rule", p.GetRule()),
+					)
+					return
+				}
+			}
+
+			m.subDataCh <- data
+		})
 	}
-	m.c.SubscribeMultiple(subMap, func(_ mqtt.Client, message mqtt.Message) {
-		logger.Info(
-			color.Theme.Sub.Text("sub"),
-			zap.String("client_id", m.id),
-			zap.String("topic", message.Topic()),
-			zap.ByteString("payload", message.Payload()),
-		)
-		m.subDataCh <- model.MQTTData{
-			Topic:   message.Topic(),
-			QoS:     message.Qos(),
-			Retain:  message.Retained(),
-			Payload: message.Payload(),
-		}
-	})
 }
 
 func (m *Client) pub() {

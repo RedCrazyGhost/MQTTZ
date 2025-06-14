@@ -9,6 +9,7 @@ package main
 import (
 	"MQTTZ/pkg/conf"
 	"MQTTZ/pkg/mqtt"
+	"MQTTZ/pkg/processor"
 )
 
 // Injectors from wire.go:
@@ -22,6 +23,7 @@ func InitializeMQTTZ() (*MQTTZ, error) {
 	if err != nil {
 		return nil, err
 	}
-	mqttz := NewMQTTZ(config, clientManager)
+	validate := processor.NewValidate()
+	mqttz := NewMQTTZ(config, clientManager, validate)
 	return mqttz, nil
 }
