@@ -1,4 +1,10 @@
-# MQTTZ
+<div align="center">
+    MQTTZ
+</div>
+
+---
+
+---
 
 ## 功能目标
 
@@ -6,6 +12,14 @@
     - 添加多个服务的连接配置
     - 提供数据转发能力
     - 提供多种数据源的处理（json、yaml、MQTTClient）
+
+## 依赖
+
+- [paho.mqtt.golang](https://github.com/eclipse/paho.mqtt.golang) - MQTT 客户端库
+- [zap](https://github.com/uber-go/zap) - 高性能日志库
+- [sonic](https://github.com/bytedance/sonic) - 高性能 JSON 处理
+- [wire](https://github.com/google/wire) - 依赖注入
+- [gofakeit](https://github.com/brianvoe/gofakeit) - 数据生成工具
 
 ## 前置条件
 

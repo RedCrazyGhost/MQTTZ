@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/go-playground/validator/v10"
 	"strings"
 
 	"MQTTZ/model"
@@ -32,6 +33,19 @@ var LOGO = strings.Join([]string{
 type MQTTZ struct {
 	config        *model.Config
 	clientManager *mqtt.ClientManager
+	validate      *validator.Validate
+}
+
+func NewMQTTZ(
+	config *model.Config,
+	manager *mqtt.ClientManager,
+	validate *validator.Validate,
+) *MQTTZ {
+	return &MQTTZ{
+		config:        config,
+		clientManager: manager,
+		validate:      validate,
+	}
 }
 
 func main() {
@@ -45,11 +59,4 @@ func main() {
 	logger.Info("initialize mqttz success")
 	mqttz.clientManager.Start()
 	select {}
-}
-
-func NewMQTTZ(config *model.Config, manager *mqtt.ClientManager) *MQTTZ {
-	return &MQTTZ{
-		config:        config,
-		clientManager: manager,
-	}
 }
