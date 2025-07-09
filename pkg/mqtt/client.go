@@ -1,7 +1,6 @@
 package mqtt
 
 import (
-	"MQTTZ/pkg/processor"
 	"cmp"
 	"fmt"
 	"sync"
@@ -9,6 +8,7 @@ import (
 
 	"MQTTZ/model"
 	"MQTTZ/pkg/logger"
+	"MQTTZ/pkg/processor"
 	"MQTTZ/utils/color"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"

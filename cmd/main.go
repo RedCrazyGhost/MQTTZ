@@ -2,13 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/go-playground/validator/v10"
 	"strings"
 
 	"MQTTZ/model"
 	"MQTTZ/pkg/logger"
 	"MQTTZ/pkg/mqtt"
 
+	"github.com/go-playground/validator/v10"
 	"go.uber.org/zap"
 )
 
