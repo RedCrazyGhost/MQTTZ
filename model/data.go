@@ -49,6 +49,18 @@ type MockMQTTData struct {
 	MQTTData
 }
 
+func init() {
+	gofakeit.AddFuncLookup("TrueOrFalse", gofakeit.Info{
+		Category:    "custom",
+		Description: "Random boolean",
+		Example:     "true",
+		Output:      "string",
+		Generate: func(f *gofakeit.Faker, m *gofakeit.MapParams, info *gofakeit.Info) (any, error) {
+			return f.RandomString([]string{"true", "false"}), nil
+		},
+	})
+}
+
 func (d MockMQTTData) GetPayload() []byte {
 	if d.MockData != nil {
 		template, err := gofakeit.Template(d.Payload.(string), &gofakeit.TemplateOptions{Data: d.MockData})
