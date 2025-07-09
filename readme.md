@@ -1,8 +1,7 @@
-# MQTTX
+# MQTTZ
 
 <img align="right" width="274px" src="./docs/logo.png">
 
-## 功能
 - 多 Brock 连接管理
 - 支持循环间隔发送生成 Mock 数据的 topic
 - 支持条件过滤、拦截订阅的 topic
