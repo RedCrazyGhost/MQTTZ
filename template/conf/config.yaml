@@ -1,3 +1,7 @@
+log:
+  enable_debug: true
+  enable_color: true
+  
 mqtt_configs:
 - broker: 127.0.0.1
   port: 1883

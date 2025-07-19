@@ -56,31 +56,8 @@ type SubConfig struct {
 	Topics []string `yaml:"topics,omitempty"`
 	Qos    byte     `yaml:"qos,omitempty"`
 
-	// BeforeProcessors []BeforeProcessor `yaml:"before_processors,omitempty"` // 前置处理器
+	Processors   []Processor   `yaml:"processors,omitempty"`    // 前置处理器
 	ForwardRules []ForwardRule `yaml:"forward_rules,omitempty"` // 转发规则
-}
-
-type ProcessorType string
-
-const (
-	ProcessorTypeInterceptor ProcessorType = "interceptor" // 拦截器
-	ProcessorTypeFilter      ProcessorType = "filter"      // 过滤器
-	ProcessorTypeForwarder   ProcessorType = "forwarder"   // 转发器
-	ProcessorTypeExtractor   ProcessorType = "extractor"   // 数据提取
-	ProcessorTypeGenerator   ProcessorType = "generator"   // 数据生成
-)
-
-type Processor struct {
-	Type ProcessorType `yaml:"type" json:"type"`
-	Rule string        `yaml:"rule" json:"rule"`
-}
-
-type BeforeProcessor struct {
-	Processor
-}
-
-type AfterProcessor struct {
-	Processor
 }
 
 type ForwardRule struct {
