@@ -7,6 +7,8 @@
 - 支持条件过滤、拦截订阅的 topic
 - 支持多 Brock 之间转发 topic
 
+如果这个项目对您有帮助，请给一个 ⭐ Star 支持！
+
 ## 依赖库
 
 - [paho.mqtt.golang](https://github.com/eclipse/paho.mqtt.golang) - MQTT 客户端库
@@ -26,7 +28,7 @@ mqtt_configs:
       client_id: mqtt_client_1
       username: ""
       password: ""
-      nickname: "abc" # 别名用作查找的 Key，如果不存在则是用 {client_id}@{broker} 作为 Key
+      nickname: "MQTTZ_1" # 别名用作查找的 Key，如果不存在则是用 {client_id}@{broker} 作为 Key
       pub_configs:
           - enable_for: true
             interval: 1s
@@ -43,14 +45,23 @@ mqtt_configs:
       sub_configs:
           - topic: json/1
             qos: 0
+            forward_rules:
+                - to_client: MQTTZ_2
           - topics:
                 - "2"
                 - "1"
+            processors:
+                - type: interceptor
+                  rule: "topic:contains=2"
+                - type: filter
+                  rule: "topic:contains=1"
+
+
     - broker: 127.0.0.1
       port: 1883
       client_id: mqtt_client_2
       username: ""
       password: ""
-      nickname: "" # 别名用作查找的 Key，如果不存在则是用 {client_id}@{broker} 作为 Key
+      nickname: "MQTTZ_2" # 别名用作查找的 Key，如果不存在则是用 {client_id}@{broker} 作为 Key
 
 ```
