@@ -46,7 +46,7 @@ docker run -d \
    make build
    ```
    
-   构建完成后，可执行文件将生成在项目根目录下。
+   构建完成后，可执行文件生成在 `./bin/MQTTZ`。
 
 ## 配置与运行
 
@@ -86,8 +86,10 @@ mqtt_configs:
 配置完成后，执行以下命令启动：
 
 ```bash
-./MQTTZ
+./bin/MQTTZ
 ```
+
+程序默认读取 `./conf/config.yaml`。若使用 `make run`，会带 `-config ./bin/conf/config.yaml`，与上述默认路径不同；可按需将配置复制到 `./bin/conf/` 或通过 `-config` 指定路径。
 
 ### 常见问题
 
@@ -98,4 +100,5 @@ mqtt_configs:
 ### 获取帮助
 
 - 查看项目 [README](../readme.md) 获取详细文档
+- 配置字段说明见 [配置说明](configuration.md)
 - 提交 [Issue](https://github.com/RedCrazyGhost/MQTTZ/issues) 报告问题
