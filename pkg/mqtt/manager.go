@@ -131,9 +131,7 @@ func (m *ClientManager) MQTTClientForwardData(fromClient string) error {
 			continue
 		}
 		for _, rule := range ruleList {
-			d := data.(model.MQTTData)
-			d.Topic = data.(model.MQTTData).Topic + "/test"
-			_ = m.MQTTClientPub(rule.ToClient, d)
+			_ = m.MQTTClientPub(rule.ToClient, data)
 		}
 	}
 

@@ -27,9 +27,13 @@ const (
 func Init(conf *model.LogConfig) error {
 	var level zapcore.Level
 
-	err := level.UnmarshalText([]byte(conf.Level))
-	if err != nil {
-		return err
+	if conf.Level != "" {
+		err := level.UnmarshalText([]byte(conf.Level))
+		if err != nil {
+			return err
+		}
+	} else {
+		level = zapcore.InfoLevel
 	}
 
 	if conf.EnableDebug {
