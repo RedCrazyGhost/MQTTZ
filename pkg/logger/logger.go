@@ -3,6 +3,7 @@ package logger
 import (
 	"cmp"
 	"os"
+	"path/filepath"
 
 	"MQTTZ/model"
 	"MQTTZ/utils/color"
@@ -60,14 +61,9 @@ func Init(conf *model.LogConfig) error {
 	var cores []zapcore.Core
 
 	if conf.OutputFile != "" {
-		_, err := os.Stat(conf.OutputFile)
-		if err != nil && !os.IsNotExist(err) {
+		dir := filepath.Dir(conf.OutputFile)
+		if err := os.MkdirAll(dir, 0o755); err != nil {
 			return err
-		}
-		if os.IsNotExist(err) {
-			if err := os.MkdirAll(conf.OutputFile, 0o755); err != nil {
-				return err
-			}
 		}
 
 		maxSize := cmp.Or(conf.MaxSize, defaultMaxSize)
