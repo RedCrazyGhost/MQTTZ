@@ -76,9 +76,9 @@ func (m *Client) Run() {
 				duration = time.Second
 			}
 			defer m.Done()
-			isFrist := true
-			for isFrist || conf.EnableFor {
-				isFrist = false
+			isFirst := true
+			for isFirst || conf.EnableFor {
+				isFirst = false
 				for _, data := range conf.SourceData {
 					m.Pub(data)
 					time.Sleep(duration)
