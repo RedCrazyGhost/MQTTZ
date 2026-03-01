@@ -2,7 +2,6 @@ package conf
 
 import (
 	"cmp"
-	"encoding/json"
 	"errors"
 	"flag"
 
@@ -10,6 +9,7 @@ import (
 	"MQTTZ/pkg/logger"
 	"MQTTZ/utils"
 
+	json "github.com/bytedance/sonic"
 	"github.com/google/wire"
 	"go.uber.org/zap"
 )
